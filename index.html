@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maid In India</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            color-scheme: light;
+        }
+        
+        /* Global Reset for Click Outlines and Highlights */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none !important;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        ::selection {
+            background-color: #8a0303;
+            color: white;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #8a0303; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6a0202; }
+        
+        /* Netflix Intro Animation adapted for light mode */
+        @keyframes netflixZoom {
+            0% { transform: scale(0.8); opacity: 0; }
+            15% { transform: scale(1); opacity: 1; text-shadow: 0 0 20px rgba(138,3,3,0.5); }
+            70% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 40px rgba(138,3,3,0.6), 0 0 80px rgba(138,3,3,0.4); }
+            100% { transform: scale(3); opacity: 0; filter: blur(10px); }
+        }
+        .animate-netflix-zoom { 
+            animation: netflixZoom 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+            display: flex;
+            width: fit-content;
+        }
+        .hover-animation-paused:hover {
+            animation-play-state: paused;
+        }
+
+        /* Fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Floating Animation (Bubbles) */
+        
+
+        /* Scroll Reveal Base Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(4rem) scale(0.95);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Blinking cursor for typewriter */
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+            color: #8a0303;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Timeline Line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 11px;
+            width: 2px;
+            background: linear-gradient(to bottom, #8a0303, #e2e8f0);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen" class="fixed inset-0 z-[10000] bg-white flex flex-col items-center justify-center overflow-hidden">
+        <div class="relative flex flex-col items-center animate-netflix-zoom select-none">
+            <h1 class="text-5xl md:text-8xl font-black tracking-widest text-black uppercase text-center" style="text-shadow: 0 0 20px rgba(138,3,3,0.4);">
+                Maid In India
+            </h1>
+            <div class="mt-8 w-px h-24 bg-gradient-to-b from-[#8a0303] to-transparent animate-pulse"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="main-app" class="hidden opacity-0 relative z-10">
+        
+        <!-- NEON PARTICLES BACKGROUND (Micro dots) -->
+        <canvas id="neon-particles" class="fixed inset-0 z-0 pointer-events-none opacity-60"></canvas>
+
+        <!-- FLOATING BACKGROUND BUBBLES (Visible on all pages) -->
+        <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+            <div class="absolute top-[10%] left-[5%] w-72 h-72 bg-red-100/40 rounded-full mix-blend-multiply filter blur-[80px] animate-float"></div>
+            <div class="absolute top-[40%] right-[10%] w-96 h-96 bg-orange-100/30 rounded-full mix-blend-multiply filter blur-[100px] animate-float-delayed"></div>
+            <div class="absolute bottom-[20%] left-[20%] w-80 h-80 bg-rose-100/40 rounded-full mix-blend-multiply filter blur-[90px] animate-float-slow"></div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md py-4 border-b border-gray-200 transition-all duration-500 shadow-sm select-none">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="navigate('home')">
+                    <img src="logo.jpg" alt="Logo" class="w-10 h-10 object-contain rounded-full bg-white group-hover:shadow-[0_0_8px_rgba(138,3,3,0.4)] transition-all" onerror="this.style.display='none'">
+                    <span class="text-gray-900 font-bold text-xl tracking-wider">MAID IN INDIA</span>
+                </div>
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex gap-8 text-sm font-medium">
+                    <button onclick="navigate('home')" class="nav-link transition-all relative text-[#8a0303] font-bold" data-target="home">Home<span class="nav-indicator absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#8a0303] rounded-full"></span></button>
+                    <button onclick="navigate('services')" class="nav-link transition-all relative text-gray-500 hover:text-[#8a0303]" data-target="services">Services<span class="nav-indicator absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#8a0303] rounded-full hidden"></span></button>
+                    <button onclick="navigate('safety')" class="nav-link transition-all relative text-gray-500 hover:text-[#8a0303]" data-target="safety">Verification<span class="nav-indicator absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#8a0303] rounded-full hidden"></span></button>
+                    <button onclick="navigate('story')" class="nav-link transition-all relative text-gray-500 hover:text-[#8a0303]" data-target="story">Our Story<span class="nav-indicator absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#8a0303] rounded-full hidden"></span></button>
+                    <button onclick="navigate('booking')" class="nav-link transition-all relative text-gray-500 hover:text-[#8a0303]" data-target="booking">Book Now<span class="nav-indicator absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#8a0303] rounded-full hidden"></span></button>
+                </div>
+
+                <div class="hidden md:block">
+                    <button onclick="navigate('contact')" class="px-6 py-2.5 bg-gray-900 hover:bg-[#8a0303] text-white rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 transform">
+                        Contact Us
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden text-gray-900 focus:outline-none" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" id="menu-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Nav (Hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 py-4 flex flex-col gap-4 px-6 shadow-2xl">
+                <button onclick="navigate('home')" class="text-left text-lg py-2 text-[#8a0303] font-bold mobile-nav-link" data-target="home">Home</button>
+                <button onclick="navigate('services')" class="text-left text-lg py-2 text-gray-600 mobile-nav-link" data-target="services">Services</button>
+                <button onclick="navigate('safety')" class="text-left text-lg py-2 text-gray-600 mobile-nav-link" data-target="safety">Verification</button>
+                <button onclick="navigate('story')" class="text-left text-lg py-2 text-gray-600 mobile-nav-link" data-target="story">Our Story</button>
+                <button onclick="navigate('booking')" class="text-left text-lg py-2 text-gray-600 mobile-nav-link" data-target="booking">Book Now</button>
+                <button onclick="navigate('contact')" class="mt-2 w-full py-3 bg-[#8a0303] text-white rounded-full font-bold">Contact Us</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="flex-grow relative z-10">
+            
+            <!-- HOME PAGE -->
+            <section id="page-home" class="page-section relative min-h-screen flex flex-col justify-center overflow-x-hidden bg-transparent pt-28 pb-16 block">
+                <div class="container mx-auto px-6 relative z-10 text-center mb-16 mt-12">
+                    <div class="reveal inline-flex items-center justify-center p-1.5 mb-8 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-default select-none">
+                        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider text-white bg-[#8a0303] rounded-full mr-3 shadow-sm flex items-center gap-1">
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i> Premium
+                        </span>
+                        <span class="text-xs text-gray-600 pr-3 font-medium tracking-wide">Domestic Care Solutions</span>
+                    </div>
+                    
+                    <h1 class="reveal text-5xl md:text-7xl lg:text-9xl font-black text-gray-900 tracking-tighter mb-6 drop-shadow-sm leading-tight select-none" style="transition-delay: 200ms;">
+                        MAID IN <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8a0303] to-red-600">INDIA</span>
+                    </h1>
+
+                    <p class="reveal text-xl md:text-3xl text-gray-600 font-medium mb-12 h-16 max-w-4xl mx-auto select-none" style="transition-delay: 400ms;">
+                        <span id="typewriter-text"></span><span class="cursor-blink">|</span>
+                    </p>
+
+                    <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4 select-none" style="transition-delay: 600ms;">
+                        <button onclick="navigate('booking')" class="group relative px-8 py-4 bg-[#8a0303] text-white font-bold text-lg rounded-full overflow-hidden transition-all hover:scale-105 shadow-[0_8px_20px_rgba(138,3,3,0.3)] flex items-center gap-2 w-full sm:w-auto justify-center">
+                            <div class="absolute inset-0 bg-gray-900 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+                            <span class="relative z-10 flex items-center gap-2">
+                                Book a Service <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                        </button>
+                        <button onclick="navigate('services')" class="px-8 py-4 bg-white/80 backdrop-blur-sm border border-gray-300 text-gray-800 font-bold text-lg rounded-full hover:border-gray-400 hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm w-full sm:w-auto justify-center hover:shadow-md">
+                            <i data-lucide="play" class="w-5 h-5 text-[#8a0303]"></i> Explore Offerings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="container mx-auto px-6 relative z-10 mb-16">
+                    <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-6 bg-white/80 backdrop-blur-md border border-gray-200 rounded-3xl p-8 shadow-xl" style="transition-delay: 700ms;">
+                        <div class="text-center border-r border-gray-200 last:border-0 md:last:border-r-0 md:border-r">
+                            <h4 class="text-4xl font-black text-[#8a0303]">100%</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mt-2 font-bold">Verified Staff</p>
+                        </div>
+                        <div class="text-center border-r border-gray-200 last:border-0 md:last:border-r-0 md:border-r hidden md:block">
+                            <h4 class="text-4xl font-black text-gray-900">10+</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mt-2 font-bold">Services</p>
+                        </div>
+                        <div class="text-center border-r border-gray-200 last:border-0 md:last:border-r-0 md:border-r hidden md:block">
+                            <h4 class="text-4xl font-black text-gray-900">24/7</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mt-2 font-bold">Support</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex justify-center text-yellow-400 mb-1 gap-1">
+                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                                <i data-lucide="star" class="w-5 h-5 fill-current text-yellow-400/50"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-gray-900">4.9/5</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1 font-bold">User Rating</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Why Choose Us -->
+                <div class="container mx-auto px-6 relative z-10 mt-auto select-none">
+                    <div class="reveal text-center mb-10" style="transition-delay: 800ms;">
+                        <h3 class="text-3xl font-bold text-gray-900 mb-2">Why Choose Us</h3>
+                        <div class="w-16 h-1 bg-[#8a0303] mx-auto rounded-full"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal" style="transition-delay: 900ms;">
+                        <div class="bg-white/90 backdrop-blur-sm border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(138,3,3,0.15)] transition-all duration-300 group shadow-md relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-bl-full -z-10 group-hover:bg-red-100 transition-colors"></div>
+                            <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-[#8a0303] mb-6 group-hover:bg-[#8a0303] group-hover:text-white transition-colors duration-300 shadow-sm animate-float">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-3">Trust & Safety</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">Document checks, complete identity verification and face-to-face screening.</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(138,3,3,0.15)] transition-all duration-300 group shadow-md relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-bl-full -z-10 group-hover:bg-red-100 transition-colors"></div>
+                            <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-[#8a0303] mb-6 group-hover:bg-[#8a0303] group-hover:text-white transition-colors duration-300 shadow-sm animate-float-delayed">
+                                <i data-lucide="graduation-cap"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-3">Professional</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">Regular training, upskilling, and strict quality standards for all helpers.</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(138,3,3,0.15)] transition-all duration-300 group shadow-md relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-bl-full -z-10 group-hover:bg-red-100 transition-colors"></div>
+                            <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-[#8a0303] mb-6 group-hover:bg-[#8a0303] group-hover:text-white transition-colors duration-300 shadow-sm animate-float">
+                                <i data-lucide="clock"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-3">Reliability</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">Immediate replacement policy and dedicated 24×7 client support.</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(138,3,3,0.15)] transition-all duration-300 group shadow-md relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-bl-full -z-10 group-hover:bg-red-100 transition-colors"></div>
+                            <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-[#8a0303] mb-6 group-hover:bg-[#8a0303] group-hover:text-white transition-colors duration-300 shadow-sm animate-float-delayed">
+                                <i data-lucide="heart-handshake"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-3">Ethical Work</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">Ethical hiring practices providing fair, respectful terms for our staff.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SERVICES PAGE -->
+            <section id="page-services" class="page-section hidden min-h-screen pt-32 pb-20 bg-transparent flex flex-col justify-center relative overflow-hidden select-none">
+                <div class="container mx-auto px-6 mb-12 relative z-10">
+                    <div class="reveal text-center">
+                        <span class="text-[#8a0303] font-bold tracking-widest uppercase text-sm mb-2 block">What We Do</span>
+                        <h2 class="text-4xl md:text-6xl font-black mb-6 text-gray-900">Services <span class="text-[#8a0303]">We Offer</span></h2>
+                        <p class="text-gray-600 max-w-2xl mx-auto text-lg">Click on any scene below to uncover how we tailor domestic solutions to the unique rhythms of your home.</p>
+                    </div>
+                </div>
+
+                <div class="relative w-full py-10 overflow-hidden bg-white/50 backdrop-blur-sm border-y border-gray-200 z-10 shadow-sm">
+                    <div class="absolute top-1 left-0 w-full h-2 border-dashed border-b-4 border-gray-300 z-20 opacity-50"></div>
+                    <div class="absolute bottom-1 left-0 w-full h-2 border-dashed border-t-4 border-gray-300 z-20 opacity-50"></div>
+                    
+                    <div id="marquee-container" class="animate-marquee hover-animation-paused py-6"></div>
+                </div>
+            </section>
+
+            <!-- SAFETY PAGE -->
+            <section id="page-safety" class="page-section hidden min-h-screen pt-32 pb-20 bg-transparent relative overflow-hidden select-none">
+                <div class="container mx-auto px-6 relative z-10">
+                    <div class="reveal text-center max-w-3xl mx-auto mb-20">
+                        <span class="text-[#8a0303] font-bold tracking-widest uppercase text-sm mb-2 block">Our Promise</span>
+                        <h2 class="text-4xl md:text-6xl font-black mb-6 text-gray-900">Safety & Verification</h2>
+                        <div class="w-20 h-1 bg-[#8a0303] mx-auto rounded-full mb-6"></div>
+                        <p class="text-xl text-gray-600 font-light leading-relaxed">Trust is earned. Our verification process treats helpers with dignity and gives families absolute peace of mind.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto" id="safety-grid"></div>
+
+                    <div class="reveal mt-20 max-w-4xl mx-auto bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between shadow-2xl hover:shadow-[0_20px_40px_rgba(138,3,3,0.3)] hover:-translate-y-1 transition-all duration-500 cursor-pointer" style="transition-delay: 400ms;">
+                        <div class="flex items-center gap-6 mb-6 md:mb-0">
+                            <div class="p-3 bg-red-900/30 rounded-full animate-pulse">
+                                <i data-lucide="shield-check" class="w-12 h-12 text-[#ff4b4b]"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-black text-2xl mb-1">100% Verified Staff</h3>
+                                <p class="text-gray-400">Every individual passes our rigorous 6-step background protocol.</p>
+                            </div>
+                        </div>
+                        <button onclick="navigate('booking')" class="px-6 py-3 bg-[#8a0303] text-white font-bold rounded-lg hover:bg-white hover:text-black transition-colors shadow-md whitespace-nowrap">
+                            Book Safely Now
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STORY PAGE -->
+            <section id="page-story" class="page-section hidden min-h-screen pt-32 pb-20 bg-transparent relative select-none">
+                <div class="container mx-auto px-6 max-w-6xl relative z-10">
+                    <div class="reveal text-center mb-16">
+                        <span class="text-[#8a0303] font-bold tracking-widest uppercase text-sm mb-2 block">Who We Are</span>
+                        <h2 class="text-4xl md:text-6xl font-black mb-6 text-gray-900">Our Story</h2>
+                        <div class="w-24 h-1 bg-[#8a0303] mx-auto rounded-full mb-8"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-20">
+                        <!-- Left Side: Vision & Mission -->
+                        <div class="space-y-8">
+                            <div class="reveal bg-white border border-gray-200 p-10 rounded-3xl relative overflow-hidden group shadow-lg hover:border-[#8a0303]/50 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(138,3,3,0.1)] hover:-translate-y-2">
+                                <div class="absolute top-0 right-0 w-64 h-64 bg-[#8a0303] filter blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700"></div>
+                                <h3 class="text-3xl font-black mb-6 text-gray-900 relative z-10">Why it matters</h3>
+                                <p class="text-gray-600 leading-relaxed text-lg mb-4 relative z-10 italic">"We saw a gap: skilled helpers treated as invisible labour. We believed dignity and professionalism could coexist with everyday domestic work."</p>
+                                <p class="text-gray-600 leading-relaxed text-lg relative z-10">Today we build bridges - between families who need trusted help and helpers who deserve fair, respectful work.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="reveal bg-gray-50 border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303]/50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 h-full group" style="transition-delay: 100ms;">
+                                    <h4 class="text-gray-900 font-bold text-xl mb-3 flex items-center gap-3"><span class="w-2 h-6 bg-[#8a0303] rounded-full inline-block group-hover:h-8 transition-all"></span> Mission</h4>
+                                    <p class="text-gray-600 leading-relaxed">To elevate household help through thorough verification, meaningful training, and an ethic of respect - so every placement honors human dignity.</p>
+                                </div>
+                                <div class="reveal bg-gray-50 border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303]/50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 h-full group" style="transition-delay: 200ms;">
+                                    <h4 class="text-gray-900 font-bold text-xl mb-3 flex items-center gap-3"><span class="w-2 h-6 bg-gray-400 rounded-full inline-block group-hover:bg-[#8a0303] transition-colors"></span> Vision</h4>
+                                    <p class="text-gray-600 leading-relaxed">A world where domestic work is safe, respected, and valued - where helpers have opportunity, and families have peace of mind.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: The Journey Timeline -->
+                        <div class="reveal bg-white border border-gray-200 p-10 rounded-3xl shadow-lg relative h-full">
+                            <h3 class="text-2xl font-black text-gray-900 mb-10 flex items-center gap-2">
+                                <i data-lucide="map" class="text-[#8a0303]"></i> The Journey
+                            </h3>
+                            
+                            <div class="relative timeline-line pl-10 space-y-12 pb-4">
+                                <div class="relative group cursor-default">
+                                    <div class="absolute -left-[45px] top-1 w-6 h-6 bg-white border-4 border-gray-300 group-hover:border-[#8a0303] rounded-full z-10 transition-colors duration-300"></div>
+                                    <h4 class="text-2xl font-black text-gray-900 group-hover:text-[#8a0303] transition-colors">2018: The Seed</h4>
+                                    <p class="text-gray-600 mt-2 leading-relaxed">Began as a simple Entrepreneurship Management assignment by two sisters, Kushboo Doshi and Reya Doshi. An idea on a single piece of paper.</p>
+                                </div>
+                                <div class="relative group cursor-default">
+                                    <div class="absolute -left-[45px] top-1 w-6 h-6 bg-white border-4 border-gray-400 group-hover:border-[#8a0303] rounded-full z-10 transition-colors duration-300"></div>
+                                    <h4 class="text-2xl font-black text-gray-900 group-hover:text-[#8a0303] transition-colors">2025: The Blueprint</h4>
+                                    <p class="text-gray-600 mt-2 leading-relaxed">Detailed planning phase. Formulation of our rigorous safety protocols, ethical employment models, and establishing our core values.</p>
+                                </div>
+                                <div class="relative group cursor-default">
+                                    <div class="absolute -left-[45px] top-1 w-6 h-6 bg-[#8a0303] rounded-full shadow-[0_0_10px_rgba(138,3,3,0.8)] z-10 animate-pulse"></div>
+                                    <h4 class="text-2xl font-black text-[#8a0303]">2026: The Launch</h4>
+                                    <p class="text-gray-600 mt-2 leading-relaxed">Official launch and first successful prototype deployment. Turning purpose into a living service.</p>
+                                    <div class="mt-4 inline-flex items-center gap-2 bg-red-50 text-[#8a0303] px-3 py-1 rounded-full text-xs font-bold border border-red-100">
+                                        <div class="w-2 h-2 bg-[#8a0303] rounded-full animate-ping"></div> Present Day
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reveal border-t border-gray-200 pt-16">
+                        <h3 class="text-3xl font-black mb-10 text-center text-gray-900">Our Core Values</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            <div class="p-8 border-t-4 border-transparent hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-xl transition-all duration-300 bg-white shadow-md rounded-xl text-center group">
+                                <div class="w-12 h-12 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-50 transition-colors">
+                                    <i data-lucide="user" class="text-gray-400 group-hover:text-[#8a0303]"></i>
+                                </div>
+                                <h5 class="text-gray-900 font-bold text-xl mb-2">Dignity</h5><p class="text-gray-500 text-sm">Every person matters.</p>
+                            </div>
+                            <div class="p-8 border-t-4 border-transparent hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-xl transition-all duration-300 bg-white shadow-md rounded-xl text-center group">
+                                <div class="w-12 h-12 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-50 transition-colors">
+                                    <i data-lucide="shield" class="text-gray-400 group-hover:text-[#8a0303]"></i>
+                                </div>
+                                <h5 class="text-gray-900 font-bold text-xl mb-2">Safety</h5><p class="text-gray-500 text-sm">Humane policies first.</p>
+                            </div>
+                            <div class="p-8 border-t-4 border-transparent hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-xl transition-all duration-300 bg-white shadow-md rounded-xl text-center group">
+                                <div class="w-12 h-12 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-50 transition-colors">
+                                    <i data-lucide="award" class="text-gray-400 group-hover:text-[#8a0303]"></i>
+                                </div>
+                                <h5 class="text-gray-900 font-bold text-xl mb-2">Professionalism</h5><p class="text-gray-500 text-sm">Clear expectations.</p>
+                            </div>
+                            <div class="p-8 border-t-4 border-transparent hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-xl transition-all duration-300 bg-white shadow-md rounded-xl text-center group">
+                                <div class="w-12 h-12 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-50 transition-colors">
+                                    <i data-lucide="heart" class="text-gray-400 group-hover:text-[#8a0303]"></i>
+                                </div>
+                                <h5 class="text-gray-900 font-bold text-xl mb-2">Empathy</h5><p class="text-gray-500 text-sm">Human-centred care.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOOKING PAGE -->
+            <section id="page-booking" class="page-section hidden min-h-screen pt-32 pb-20 bg-transparent flex flex-col justify-center relative">
+                <div class="container mx-auto px-6 relative z-10">
+                    <div class="reveal max-w-4xl mx-auto bg-white/90 backdrop-blur-md border border-gray-200 rounded-3xl p-8 md:p-14 shadow-2xl hover:border-[#8a0303]/30 transition-all duration-500">
+                        <div class="mb-12 text-center select-none">
+                            <h2 class="text-4xl md:text-5xl font-black mb-4 text-gray-900">Book a Service</h2>
+                            <p class="text-gray-600 text-lg">Tailor your requirements and let us find the perfect match for your home.</p>
+                        </div>
+
+                        <form id="booking-form" class="space-y-8" onsubmit="handleBookingSubmit(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="space-y-3">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest select-none">Service Type</label>
+                                    <select id="book-type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors appearance-none cursor-pointer shadow-sm">
+                                        <option>Cooking</option>
+                                        <option>Cleaning</option>
+                                        <option>Babysitter / Nanny</option>
+                                        <option>Elderly Day Care</option>
+                                        <option>Full-Time Maid</option>
+                                        <option>Part-Time Maid</option>
+                                        <option>Other Services...</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest select-none">Frequency</label>
+                                    <select id="book-freq" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors appearance-none cursor-pointer shadow-sm">
+                                        <option>Daily</option>
+                                        <option>Weekly</option>
+                                        <option>Monthly (Live-In)</option>
+                                        <option>Hourly Visit</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="space-y-3">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest select-none">Date</label>
+                                    <input type="date" id="book-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors shadow-sm" />
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest select-none">Time</label>
+                                    <input type="time" id="book-time" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors shadow-sm" />
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 pt-4 border-t border-gray-100">
+                                <label class="text-xs font-bold text-gray-500 uppercase tracking-widest select-none">Your Details</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <input type="text" id="book-name" placeholder="Full Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors shadow-sm" />
+                                    <input type="tel" id="book-phone" placeholder="10-Digit Mobile No." maxlength="10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors shadow-sm" />
+                                    <input type="email" id="book-email" placeholder="Email Address" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] focus:ring-1 focus:ring-[#8a0303] transition-colors shadow-sm" />
+                                </div>
+                            </div>
+
+                            <!-- Form Messages -->
+                            <div id="booking-error" class="hidden p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm flex items-center gap-2 shadow-sm animate-fade-in">
+                                <i data-lucide="x" class="w-5 h-5 text-red-500"></i> <span id="error-msg-text"></span>
+                            </div>
+                            <div id="booking-success" class="hidden p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm flex items-center gap-2 shadow-sm animate-fade-in">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i> Booking Request Successful! Our team will contact you shortly via phone or email.
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#8a0303] hover:bg-black text-white font-bold text-xl py-5 rounded-xl transition-all duration-300 mt-8 shadow-[0_8px_20px_rgba(138,3,3,0.3)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.3)] select-none">
+                                Confirm Booking Request
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT PAGE -->
+            <section id="page-contact" class="page-section hidden min-h-screen pt-32 pb-20 bg-transparent flex flex-col justify-center relative select-none">
+                <div class="container mx-auto px-6 max-w-5xl relative z-10">
+                    <div class="reveal text-center mb-16">
+                        <h2 class="text-4xl md:text-6xl font-black mb-6 text-gray-900">Get in Touch</h2>
+                        <p class="text-xl text-gray-600">We're here to help build bridges for your household.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div class="reveal bg-white/90 backdrop-blur-sm border border-gray-200 p-10 rounded-3xl hover:border-[#8a0303]/50 hover:shadow-[0_20px_40px_rgba(138,3,3,0.1)] hover:-translate-y-2 transition-all duration-300 shadow-lg cursor-default">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-8">Contact Information</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-4 group cursor-pointer">
+                                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center border border-red-100 group-hover:bg-[#8a0303] transition-colors">
+                                        <i data-lucide="phone-call" class="w-5 h-5 text-[#8a0303] group-hover:text-white transition-colors"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Call Us</p>
+                                        <p class="text-gray-900 font-bold text-lg group-hover:text-[#8a0303] transition-colors">+91 98765 43210</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 group cursor-pointer">
+                                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center border border-red-100 group-hover:bg-[#8a0303] transition-colors">
+                                        <i data-lucide="mail" class="w-5 h-5 text-[#8a0303] group-hover:text-white transition-colors"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Email</p>
+                                        <p class="text-gray-900 font-bold text-lg group-hover:text-[#8a0303] transition-colors">contact@maidinindia.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-12 pt-8 border-t border-gray-100">
+                                <p class="text-sm text-gray-500 mb-2">Founders</p>
+                                <p class="text-gray-900 font-medium">Kushboo Doshi & Reya Doshi</p>
+                            </div>
+                        </div>
+                        
+                        <div class="reveal bg-white/90 backdrop-blur-sm border border-gray-200 p-10 rounded-3xl hover:border-[#8a0303]/50 hover:shadow-[0_20px_40px_rgba(138,3,3,0.1)] hover:-translate-y-2 transition-all duration-300 shadow-lg" style="transition-delay: 200ms;">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-8">Request a Callback</h3>
+                            <form id="contact-form" class="space-y-4" onsubmit="handleContactSubmit(event)">
+                                <input type="text" id="contact-name" placeholder="Your Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] shadow-sm" />
+                                <input type="tel" id="contact-phone" placeholder="10-Digit Mobile Number" maxlength="10" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] shadow-sm" />
+                                <input type="email" id="contact-email" placeholder="Your Email Address" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] shadow-sm" />
+                                <textarea id="contact-message" placeholder="How can we help?" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-gray-900 focus:outline-none focus:border-[#8a0303] resize-none shadow-sm"></textarea>
+                                
+                                <div id="contact-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm flex items-center gap-2 shadow-sm animate-fade-in">
+                                    <i data-lucide="x" class="w-4 h-4 text-red-500"></i> <span id="contact-err-text"></span>
+                                </div>
+                                <div id="contact-success" class="hidden p-3 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm flex items-center gap-2 shadow-sm animate-fade-in">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> Request Sent!
+                                </div>
+
+                                <button type="submit" class="w-full bg-black text-white font-bold py-4 rounded-xl hover:bg-[#8a0303] transition-colors shadow-md">
+                                    Submit Request
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-white/80 backdrop-blur-md py-8 border-t border-gray-200 relative z-20 select-none shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+                <div class="flex items-center gap-2 mb-4 md:mb-0">
+                    <img src="logo.jpg" alt="Logo" class="w-6 h-6 object-contain rounded-full bg-white" onerror="this.style.display='none'">
+                    <span class="font-bold text-gray-900">MAID IN INDIA</span> &copy; 2026
+                </div>
+                <div class="flex gap-6">
+                    <button onclick="openPolicyModal('privacy')" class="hover:text-[#8a0303] transition-colors focus:outline-none">Privacy Policy</button>
+                    <button onclick="openPolicyModal('tos')" class="hover:text-[#8a0303] transition-colors focus:outline-none">Terms of Service</button>
+                </div>
+            </div>
+        </footer>
+
+        <!-- MODAL FOR SERVICES -->
+        <div id="service-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm animate-fade-in select-none">
+            <div class="bg-white border border-gray-200 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row transform transition-transform scale-100">
+                <button onclick="closeModal('service-modal')" class="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 backdrop-blur hover:bg-[#8a0303] text-gray-900 hover:text-white rounded-full flex items-center justify-center transition-colors shadow-sm focus:outline-none">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div class="md:w-1/2 h-64 md:h-auto relative bg-gray-100 overflow-hidden group">
+                    <img id="modal-img" src="" alt="Service" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent to-white md:block hidden"></div>
+                </div>
+                <div class="md:w-1/2 p-8 flex flex-col justify-center relative bg-white">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#8a0303] filter blur-[60px] opacity-10"></div>
+                    <h3 id="modal-title" class="text-3xl font-black text-gray-900 mb-4 relative z-10"></h3>
+                    <p id="modal-desc" class="text-gray-600 leading-relaxed mb-8 relative z-10"></p>
+                    <button onclick="closeModal('service-modal'); navigate('booking');" class="px-6 py-3 bg-black text-white font-bold rounded-lg hover:bg-[#8a0303] hover:shadow-lg hover:-translate-y-1 transition-all w-fit relative z-10 shadow-md">
+                        Book this Service
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL FOR POLICY/TOS -->
+        <div id="policy-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white border border-gray-200 rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden shadow-2xl relative flex flex-col">
+                <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                    <h3 id="policy-title" class="text-2xl font-black text-gray-900"></h3>
+                    <button onclick="closeModal('policy-modal')" class="w-8 h-8 bg-white hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-full flex items-center justify-center transition-colors shadow-sm focus:outline-none">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div id="policy-content" class="p-8 overflow-y-auto text-gray-600 text-sm space-y-6 leading-relaxed">
+                    <!-- Injected via JS -->
+                </div>
+                <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+                    <button onclick="closeModal('policy-modal')" class="px-6 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-[#8a0303] transition-colors shadow-md">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Data Models
+        const servicesData = [
+            { title: "Cooking", img: "cooking.jpg", desc: "Daily meal preparation, menu planning and strict kitchen hygiene maintained to the highest standards." },
+            { title: "Cleaning", img: "cleaning.jpg", desc: "Regular cleaning, deep cleans and meticulous upkeep of your living spaces for a spotless home." },
+            { title: "Washing & Laundry", img: "laundry.jpg", desc: "Professional washing, drying, ironing and delicate garment care." },
+            { title: "Babysitter / Nanny", img: "babysitter.jpg", desc: "Experienced, compassionate caregivers for infants, toddlers, and comprehensive day-care support." },
+            { title: "Elderly Day Care", img: "elderly.jpg", desc: "Patient companion care, timely medication reminders, and gentle mobility assistance." },
+            { title: "Married Couple", img: "couple.jpg", desc: "Trusted couple teams providing comprehensive, unified household coverage." },
+            { title: "Japa & Postnatal", img: "japa.jpg", desc: "Specialized postnatal support, traditional massage, and mother-focused recovery care." },
+            { title: "Massage Support", img: "massage.jpg", desc: "Therapeutic massage and gentle, child-safe techniques for women and children." },
+            { title: "Full-Time Maid", img: "fulltime.jpg", desc: "Long-term placements for consistent, reliable, and immersive household support." },
+            { title: "Part-Time Maid", img: "parttime.jpg", desc: "Flexible schedules strictly tailored to households with intermittent or lighter needs." }
+        ];
+
+        const safetySteps = [
+            { icon: "file-text", title: "Document Verification", desc: "Authentic document checks and secure record keeping to ensure transparency and safety." },
+            { icon: "user-check", title: "Identity Check", desc: "Multiple verification steps including photo ID and database checks where available." },
+            { icon: "users", title: "In-Person Screening", desc: "Face-to-face assessments to evaluate skills, communication, and cultural fit." },
+            { icon: "graduation-cap", title: "Training & Conduct", desc: "Practical training covering household best practices, conduct and safety protocols." },
+            { icon: "scale", title: "Ethical Employment", desc: "We hire ethically and provide fair working terms with respect for helpers." },
+            { icon: "shield-check", title: "Accountability", desc: "24×7 support, immediate replacement and clear accountability for every placement." }
+        ];
+
+        const legalTexts = {
+            tos: {
+                title: "Terms of Service",
+                content: `
+                    <h4 class="font-bold text-gray-900 text-base">1. Acceptance of Terms</h4>
+                    <p>By accessing and using Maid In India ("Company", "we", "us", or "our"), you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
+                    <h4 class="font-bold text-gray-900 text-base">2. Description of Service</h4>
+                    <p>Maid In India provides a platform connecting households with thoroughly vetted, trained, and verified domestic help professionals. We act as an intermediary to facilitate interviews, placements, and ongoing support.</p>
+                    <h4 class="font-bold text-gray-900 text-base">3. User Conduct and Responsibilities</h4>
+                    <p>Users agree to treat all domestic helpers with the utmost dignity and respect. Any form of harassment, abuse, or unethical behavior is strictly prohibited and will result in immediate termination of services without refund.</p>
+                    <h4 class="font-bold text-gray-900 text-base">4. Background Checks & Verification</h4>
+                    <p>While Maid In India conducts extensive 6-step background checks, we provide these as a supplementary layer of security. We rely on government databases and third-party verification agencies.</p>
+                    <h4 class="font-bold text-gray-900 text-base">5. Payments & Replacements</h4>
+                    <p>Payments for placements are due as per the agreed schedule. We offer a replacement guarantee subject to the specific terms of your signed service contract. Refunds are processed strictly according to our cancellation policy.</p>
+                    <h4 class="font-bold text-gray-900 text-base">6. Limitation of Liability</h4>
+                    <p>Maid In India shall not be liable for any indirect, incidental, special, consequential or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly.</p>
+                `
+            },
+            privacy: {
+                title: "Privacy Policy",
+                content: `
+                    <h4 class="font-bold text-gray-900 text-base">1. Information We Collect</h4>
+                    <p>We collect information you provide directly to us when you request a service, fill out a form, or communicate with us. This includes your name, email address, phone number, home address, and any other information you choose to provide concerning your household requirements.</p>
+                    <h4 class="font-bold text-gray-900 text-base">2. How We Use Your Information</h4>
+                    <p>We use the information we collect to provide, maintain, and improve our services, specifically to match your household with the appropriate domestic helper. We also use your information to communicate with you regarding bookings, customer support, and administrative messages.</p>
+                    <h4 class="font-bold text-gray-900 text-base">3. Information Sharing</h4>
+                    <p>We share limited, necessary information with our verified domestic helpers strictly for the purpose of fulfilling your service requests. We do not sell or rent your personal data to third-party marketers.</p>
+                    <h4 class="font-bold text-gray-900 text-base">4. Data Security</h4>
+                    <p>We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                    <h4 class="font-bold text-gray-900 text-base">5. Your Rights</h4>
+                    <p>You have the right to request access to the personal data we hold about you, to request that we correct any inaccuracies, or to request the deletion of your data, subject to legal and contractual constraints.</p>
+                `
+            }
+        };
+
+        // 1. Populating Dynamic Content (Services Marquee & Safety Grid)
+        function populateContent() {
+            const safetyContainer = document.getElementById('safety-grid');
+            safetySteps.forEach((step, idx) => {
+                safetyContainer.innerHTML += `
+                    <div class="reveal bg-white/90 backdrop-blur border border-gray-200 p-8 rounded-2xl hover:border-[#8a0303] hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(138,3,3,0.15)] transition-all duration-500 h-full group flex flex-col shadow-sm cursor-default" style="transition-delay: ${idx * 50}ms">
+                        <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-[#8a0303] mb-6 group-hover:bg-[#8a0303] group-hover:text-white transition-colors duration-300 shadow-sm">
+                            <i data-lucide="${step.icon}"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#8a0303] transition-colors">${step.title}</h4>
+                        <p class="text-gray-600 leading-relaxed text-sm flex-grow">${step.desc}</p>
+                    </div>`;
+            });
+
+            const marqueeContainer = document.getElementById('marquee-container');
+            [...servicesData, ...servicesData].forEach((srv, idx) => {
+                const fallbackUrl = "https://via.placeholder.com/400x600/e2e8f0/8a0303?text=" + srv.title.replace(/ /g, '+');
+                marqueeContainer.innerHTML += `
+                    <div class="w-64 md:w-80 flex-shrink-0 mx-4 cursor-pointer group" onclick="openModal(${idx % servicesData.length})">
+                        <div class="relative h-96 rounded-2xl overflow-hidden border border-gray-200 transition-all duration-500 group-hover:border-[#8a0303] group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(138,3,3,0.2)] bg-gray-100 shadow-md">
+                            <img src="${srv.img}" alt="${srv.title}" onerror="this.src='${fallbackUrl}'" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transform group-hover:scale-110 transition-all duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-80 group-hover:opacity-70 transition-opacity"></div>
+                            <div class="absolute bottom-0 left-0 p-8 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                <h3 class="text-3xl font-black text-white mb-2 drop-shadow-lg">${srv.title}</h3>
+                                <div class="flex items-center text-[#ff6b6b] text-sm font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity delay-100">
+                                    View Details <i data-lucide="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons(); 
+        }
+
+        // 2. Navigation System
+        function navigate(pageId) {
+            document.querySelectorAll('.page-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            const target = document.getElementById('page-' + pageId);
+            target.classList.remove('hidden');
+            target.classList.add('block');
+            window.scrollTo(0, 0);
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                const targetAttr = el.getAttribute('data-target');
+                const indicator = el.querySelector('.nav-indicator');
+                if (targetAttr === pageId) {
+                    el.classList.add('text-[#8a0303]', 'font-bold');
+                    el.classList.remove('text-gray-500', 'hover:text-[#8a0303]');
+                    if(indicator) indicator.classList.remove('hidden');
+                } else {
+                    el.classList.remove('text-[#8a0303]', 'font-bold');
+                    el.classList.add('text-gray-500', 'hover:text-[#8a0303]');
+                    if(indicator) indicator.classList.add('hidden');
+                }
+            });
+
+            document.querySelectorAll('.mobile-nav-link').forEach(el => {
+                if (el.getAttribute('data-target') === pageId) {
+                    el.classList.add('text-[#8a0303]', 'font-bold');
+                    el.classList.remove('text-gray-600');
+                } else {
+                    el.classList.remove('text-[#8a0303]', 'font-bold');
+                    el.classList.add('text-gray-600');
+                }
+            });
+
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(!mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            triggerScrollReveal();
+            if(pageId === 'home') triggerTypewriter();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            if(menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                menu.classList.add('hidden');
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
+        }
+
+        // 3. Modals (Services & Policies)
+        function openModal(index) {
+            const srv = servicesData[index];
+            document.getElementById('modal-title').innerText = srv.title;
+            document.getElementById('modal-desc').innerText = srv.desc;
+            
+            const imgEl = document.getElementById('modal-img');
+            imgEl.src = srv.img;
+            const fallbackUrl = "https://via.placeholder.com/400x600/e2e8f0/8a0303?text=" + srv.title.replace(/ /g, '+');
+            imgEl.onerror = () => { imgEl.src = fallbackUrl; };
+
+            const modal = document.getElementById('service-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openPolicyModal(type) {
+            const data = legalTexts[type];
+            document.getElementById('policy-title').innerText = data.title;
+            document.getElementById('policy-content').innerHTML = data.content;
+            
+            const modal = document.getElementById('policy-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 4. Form Submissions & Strict Validations
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            
+            document.getElementById('booking-error').classList.add('hidden');
+            document.getElementById('booking-success').classList.add('hidden');
+
+            const date = document.getElementById('book-date').value;
+            const time = document.getElementById('book-time').value;
+            const name = document.getElementById('book-name').value;
+            const phone = document.getElementById('book-phone').value;
+            const email = document.getElementById('book-email').value;
+
+            // Empty check
+            if (!date || !time || !name || !phone || !email) {
+                document.getElementById('error-msg-text').innerText = "Please fill out all the details before confirming.";
+                document.getElementById('booking-error').classList.remove('hidden');
+                return;
+            }
+
+            // Strict 10-digit Phone Validation
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                document.getElementById('error-msg-text').innerText = "Invalid Mobile Number. It must be exactly 10 digits.";
+                document.getElementById('booking-error').classList.remove('hidden');
+                return;
+            }
+
+            // Success
+            document.getElementById('booking-success').classList.remove('hidden');
+        }
+
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            
+            document.getElementById('contact-error').classList.add('hidden');
+            document.getElementById('contact-success').classList.add('hidden');
+
+            const name = document.getElementById('contact-name').value;
+            const phone = document.getElementById('contact-phone').value;
+            const email = document.getElementById('contact-email').value;
+            const msg = document.getElementById('contact-message').value;
+
+            if (!name || !phone || !email || !msg) {
+                document.getElementById('contact-err-text').innerText = "Please fill out all fields.";
+                document.getElementById('contact-error').classList.remove('hidden');
+                return;
+            }
+
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                document.getElementById('contact-err-text').innerText = "Mobile Number must be exactly 10 digits.";
+                document.getElementById('contact-error').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('contact-success').classList.remove('hidden');
+            document.getElementById('contact-form').reset();
+        }
+
+        // 5. Animations & Effects
+        
+        // Typewriter
+        let typeWriterInterval;
+        function triggerTypewriter() {
+            clearInterval(typeWriterInterval);
+            const text = "You can love her, you can hate her — but you can't ignore her.";
+            const element = document.getElementById('typewriter-text');
+            element.innerText = '';
+            let i = 0;
+            typeWriterInterval = setInterval(() => {
+                element.innerText += text.charAt(i);
+                i++;
+                if (i >= text.length) clearInterval(typeWriterInterval);
+            }, 60);
+        }
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        function triggerScrollReveal() {
+            setTimeout(() => {
+                document.querySelectorAll('.page-section:not(.hidden) .reveal').forEach(el => {
+                    revealObserver.observe(el);
+                });
+            }, 50);
+        }
+
+        // 6. Neon Particles Background - Light theme configuration
+        const canvas = document.getElementById('neon-particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1; 
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = 'rgba(138, 3, 3, 0.8)'; 
+                ctx.fillStyle = `rgba(220, 38, 38, ${this.alpha})`; 
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let particleCount = Math.floor((window.innerWidth * window.innerHeight) / 12000);
+            if (particleCount > 80) particleCount = 80;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Clear errors on typing
+        function setupFormListeners() {
+            document.querySelectorAll('#booking-form input, #booking-form select').forEach(input => {
+                input.addEventListener('input', () => {
+                    document.getElementById('booking-error').classList.add('hidden');
+                    document.getElementById('booking-success').classList.add('hidden');
+                });
+            });
+            document.querySelectorAll('#contact-form input, #contact-form textarea').forEach(input => {
+                input.addEventListener('input', () => {
+                    document.getElementById('contact-error').classList.add('hidden');
+                    document.getElementById('contact-success').classList.add('hidden');
+                });
+            });
+        }
+
+        // 7. Initialization Sequence
+        window.onload = () => {
+            populateContent();
+            setupFormListeners();
+            
+            // Netflix Intro Timing
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.display = 'none';
+                
+                const mainApp = document.getElementById('main-app');
+                mainApp.classList.remove('hidden', 'opacity-0');
+                mainApp.classList.add('flex', 'flex-col', 'min-h-screen', 'animate-fade-in');
+                
+                triggerTypewriter();
+                triggerScrollReveal();
+
+                initParticles();
+                animateParticles();
+            }, 3000); 
+        };
+    </script>
+
+</body>
+</html>
